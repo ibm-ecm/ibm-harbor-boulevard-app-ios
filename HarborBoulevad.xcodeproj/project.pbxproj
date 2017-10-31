@@ -11,6 +11,7 @@
 		B77816141D3D11C600D50EDD /* IBMCaptureSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B778160F1D3D11C100D50EDD /* IBMCaptureSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B77816151D3D11C600D50EDD /* IBMCaptureUISDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B77816101D3D11C100D50EDD /* IBMCaptureUISDK.framework */; };
 		B77816161D3D11C600D50EDD /* IBMCaptureUISDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B77816101D3D11C100D50EDD /* IBMCaptureUISDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		EB27F6581F9F9BCE00214EAC /* license_back.png in Resources */ = {isa = PBXBuildFile; fileRef = EB27F6571F9F9BCD00214EAC /* license_back.png */; };
 		F936F19E1BD904BA007C5858 /* tessdata in Resources */ = {isa = PBXBuildFile; fileRef = F936F19D1BD904BA007C5858 /* tessdata */; };
 		F936F1A41BD9160F007C5858 /* FieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F936F1A31BD9160F007C5858 /* FieldCell.swift */; };
 		F936F1A61BD91B33007C5858 /* form.png in Resources */ = {isa = PBXBuildFile; fileRef = F936F1A51BD91B33007C5858 /* form.png */; };
@@ -60,6 +61,7 @@
 		6B2BEBE91C85A97C003F03B4 /* HarborBoulevard-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "HarborBoulevard-Bridging-Header.h"; sourceTree = "<group>"; };
 		B778160F1D3D11C100D50EDD /* IBMCaptureSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IBMCaptureSDK.framework; path = Frameworks/IBMCaptureSDK.framework; sourceTree = "<group>"; };
 		B77816101D3D11C100D50EDD /* IBMCaptureUISDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IBMCaptureUISDK.framework; path = Frameworks/IBMCaptureUISDK.framework; sourceTree = "<group>"; };
+		EB27F6571F9F9BCD00214EAC /* license_back.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = license_back.png; sourceTree = "<group>"; };
 		F936F19D1BD904BA007C5858 /* tessdata */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tessdata; sourceTree = "<group>"; };
 		F936F1A31BD9160F007C5858 /* FieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = FieldCell.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		F936F1A51BD91B33007C5858 /* form.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = form.png; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 			children = (
 				F936F1AB1BD925A0007C5858 /* check-filled.png */,
 				F936F1A71BD924CC007C5858 /* license.png */,
+				EB27F6571F9F9BCD00214EAC /* license_back.png */,
 				F936F1A81BD924CC007C5858 /* check.png */,
 				F936F1A51BD91B33007C5858 /* form.png */,
 				F9B712081BD6997D00866303 /* filled-check.jpg */,
@@ -262,6 +265,7 @@
 					F9B711D11BD63C2500866303 = {
 						CreatedOnToolsVersion = 7.0.1;
 						DevelopmentTeam = BQHMJ2C6RL;
+						LastSwiftMigration = 0900;
 					};
 				};
 			};
@@ -294,6 +298,7 @@
 				F936F1A91BD924CC007C5858 /* license.png in Resources */,
 				F9B711DD1BD63C2500866303 /* Assets.xcassets in Resources */,
 				F936F1A61BD91B33007C5858 /* form.png in Resources */,
+				EB27F6581F9F9BCE00214EAC /* license_back.png in Resources */,
 				F9B712091BD6997D00866303 /* filled-check.jpg in Resources */,
 				F9B711DB1BD63C2500866303 /* Main.storyboard in Resources */,
 				F936F19E1BD904BA007C5858 /* tessdata in Resources */,
@@ -475,6 +480,7 @@
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "HarborBoulevard/HarborBoulevard-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -502,6 +508,7 @@
 				PRODUCT_NAME = HarborBoulevad;
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "HarborBoulevard/HarborBoulevard-Bridging-Header.h";
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

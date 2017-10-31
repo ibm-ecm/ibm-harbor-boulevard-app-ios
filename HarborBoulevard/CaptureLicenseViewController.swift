@@ -15,11 +15,11 @@ class CaptureLicenseViewController: CameraViewController {
         }
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         if TARGET_IPHONE_SIMULATOR == 1 && self.image == nil{
-            self.imageCaptured(UIImage(named: "License.png")!)
+            self.imageCaptured(UIImage(named: "license_back.png")!)
         }
     }
     

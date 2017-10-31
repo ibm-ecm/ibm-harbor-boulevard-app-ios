@@ -19,16 +19,16 @@ class DocumentsTableViewController: UITableViewController {
         return self.batch.documents.first
         }()
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         self.tableView.reloadData()
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
-        if let uploadViewController = segue.destinationViewController as? UploadViewController{
+    override func prepare(for segue: UIStoryboardSegue, sender: Any!) {
+        if let uploadViewController = segue.destination as? UploadViewController{
             uploadViewController.success = sender as! Bool
-        }else if let navigationController = segue.destinationViewController as? UINavigationController{
+        }else if let navigationController = segue.destination as? UINavigationController{
             if let cameraViewController = navigationController.viewControllers[0] as? CameraViewController{
                 
                 if let page = sender as? ICPPage{
@@ -45,25 +45,25 @@ class DocumentsTableViewController: UITableViewController {
         if self.allDocumentsAreValid() == true{
             self.uploadBatch()
         }else{
-            let alert = UIAlertController(title: "Missing information", message: "Some documents appeared to not be valid, please review the documents provided", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
+            let alert = UIAlertController(title: "Missing information", message: "Some documents appeared to not be valid, please review the documents provided", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
     // MARK: UITableView Datasource
     
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return self.document?.pages.count ?? 0
     }
     
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = self.tableView.dequeueReusableCellWithIdentifier("PageCell") as! PageCell
+        let cell = self.tableView.dequeueReusableCell(withIdentifier: "PageCell") as! PageCell
         
         if let page = self.document?.pages[indexPath.section]{
             cell.configureWithPage(page, error: page.isValid().message)
@@ -72,19 +72,19 @@ class DocumentsTableViewController: UITableViewController {
         return cell
     }
     
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80.0
     }
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if let page = self.document?.pages[indexPath.section]{
             if page.type?.typeId == "Form"{
-                self.performSegueWithIdentifier("recaptureForm", sender: page)
+                self.performSegue(withIdentifier: "recaptureForm", sender: page)
             }else if page.type?.typeId == "Driver License"{
-                self.performSegueWithIdentifier("recaptureLicense", sender: page)
+                self.performSegue(withIdentifier: "recaptureLicense", sender: page)
             }else if page.type?.typeId == "Check"{
-                self.performSegueWithIdentifier("recaptureCheck", sender: page)
+                self.performSegue(withIdentifier: "recaptureCheck", sender: page)
             }
         }
         
@@ -105,28 +105,21 @@ class DocumentsTableViewController: UITableViewController {
     }
     
     private func uploadBatch(){
-        let hud = MBProgressHUD.showHUDAddedTo(self.view, animated: true)
-        hud.labelText = "Uploading batch"
-        hud.mode = MBProgressHUDMode.DeterminateHorizontalBar
+        let hud = MBProgressHUD.showAdded(to: self.view, animated: true)
+        hud?.labelText = "Uploading batch"
+        hud?.mode = .determinateHorizontalBar
+        hud?.progress = 0.1
         
-        var pageIndex = 1
         
-        let serviceClientProgressionBlock : ICPSessionManagerUpdateProgess = { (progress : Float, uploadingObject : AnyObject?) -> Void in
-            
-            if uploadingObject is ICPPage{
-                hud.labelText = "Uploading page \(pageIndex)/3"
-                if progress > 1.0 {
-                    pageIndex += 1
-                }
-            }
-            
-            print("\(progress)")
-            hud.progress = progress
+        let serviceClientProgressionBlock : ICPSessionManagerUpdateProgess = { (progress : Float, uploadingObject : Any?) -> Void in
+            hud?.labelText = "Uploading..."
+            hud?.progress = 0.6
+            print(progress)
         }
         
-        self.serviceClient.uploadBatch(self.batch, withProgressBlock: serviceClientProgressionBlock, andCompletion: { (success : Bool, results : AnyObject?, error: NSError?) -> Void in
-            MBProgressHUD.hideHUDForView(self.view, animated: true)
-            self.performSegueWithIdentifier("next", sender: (error == nil))
+        self.serviceClient.uploadBatch(self.batch, withProgressBlock: serviceClientProgressionBlock, andCompletion: { (success : Bool, results : Any?, error: Error?) -> Void in
+            MBProgressHUD.hide(for: self.view, animated: true)
+            self.performSegue(withIdentifier: "next", sender: (error == nil))
         })
     }
 

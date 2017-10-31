@@ -31,9 +31,9 @@ class PageCheckViewController: PageViewController {
             if applyBlackAndWhiteFilter == true{
                 let imageEngine = ICPCoreImageImageEngine()
                 
-                imageEngine.rotateToRightImage(self.image!, completionBlock: { (image : UIImage?) -> Void in
+                imageEngine.rotate(toRightImage: self.image!, completionBlock: { (image : UIImage?) -> Void in
                     
-                    imageEngine.applyFilter(ICPFilterType.BlackAndWhite, toImage: self.image!, completionBlock: { (image : UIImage?) -> Void in
+                    imageEngine.apply(ICPFilterType.blackAndWhite, to: self.image!, completionBlock: { (image : UIImage?) -> Void in
                         
                         if let blackAndWhiteCheck = image {
                             self.ocrCheck(field, image: blackAndWhiteCheck)
@@ -52,17 +52,17 @@ class PageCheckViewController: PageViewController {
         }
     }
     
-    private func ocrCheck(field : ICPField, image : UIImage){
+    private func ocrCheck(_ field : ICPField, image : UIImage){
         if let signatureFieldType = field.type as? ICPFieldType{
             let zone = signatureFieldType.scaledZone(self.refSize, actualSize: image.size)
             
-            let textRecognizedBlock : ICPOcrEngineTextRecognizedBlock = { (image : UIImage, text : String, metadata: [String : [AnyObject]]) -> Void in
+            let textRecognizedBlock : ICPOcrEngineTextRecognizedBlock = { (image : UIImage, text : String, metadata: [String : [Any]]) -> Void in
                 print("found signature: \(text)")
                 field.value = text
                 self.processFinished(true)
             }
             
-            self.ocrEngine.recognizeTextInImage(image, withRect: zone, whitelist: nil, highlightChars: false, completionBlock: textRecognizedBlock)
+            self.ocrEngine.recognizeText(in: image, with: zone, whitelist: nil, highlightChars: false, completionBlock: textRecognizedBlock)
         }
     }
 }

@@ -26,10 +26,10 @@ class CameraViewController: BaseViewController, ICPCameraViewDelegate {
     lazy var page : ICPPage? =
     {
         
-        if let page = self.capture?.objectFactory!.pageWithDocument(self.document, type: self.pageType){
+        if let page = self.capture?.objectFactory!.page(with: self.document, type: self.pageType){
             page.modifiedImage = self.image
             page.originalImage = self.image
-            page.status = ICPStatus.Queued
+            page.status = .queued
             return page
         }
         return nil
@@ -40,10 +40,10 @@ class CameraViewController: BaseViewController, ICPCameraViewDelegate {
         super.viewDidLoad()
 
         if self.batch == nil{
-            if let newBatch = self.capture?.objectFactory!.batchWithService(self.service, type: self.batchType){
-                newBatch.status = ICPStatus.Queued
+            if let newBatch = self.capture?.objectFactory!.batch(with: self.service, type: self.batchType){
+                newBatch.status = .queued
                 if let documentType = self.batchType?.documentTypes.first{
-                    self.capture?.objectFactory!.documentWithBatch(newBatch, type: documentType)
+                    self.capture?.objectFactory!.document(with: newBatch, type: documentType)
                 }
                 self.batch = newBatch
             }
@@ -52,20 +52,20 @@ class CameraViewController: BaseViewController, ICPCameraViewDelegate {
         self.cameraView.delegate = self
     }
 
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         self.cameraView.restartPreview()
     }
     
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
         self.cameraView.stopPreview()
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
-        if let pageViewController = segue.destinationViewController as? PageViewController{
+    override func prepare(for segue: UIStoryboardSegue, sender: Any!) {
+        if let pageViewController = segue.destination as? PageViewController{
             pageViewController.batchType = self.batchType
             pageViewController.capture = self.capture
             pageViewController.batch = self.batch
@@ -73,24 +73,29 @@ class CameraViewController: BaseViewController, ICPCameraViewDelegate {
             if self.page != nil{
                 pageViewController.page = self.page
             }
+        } else if let cameraViewController = segue.destination as? CameraViewController{
+            cameraViewController.batchType = self.batchType
+            cameraViewController.capture = self.capture
+            cameraViewController.batch = self.batch
+            cameraViewController.serviceClient = self.serviceClient
         }
     }
     
     // MARK: ICPCameraViewDelegate
     
-    func cameraView(cameraView: ICPCameraView, didTakeOriginalPhoto originalPhoto: UIImage?, modifiedPhoto: UIImage?) {
+    func cameraView(_ cameraView: ICPCameraView, didTakeOriginalPhoto originalPhoto: UIImage?, modifiedPhoto: UIImage?) {
         self.imageCaptured(modifiedPhoto!)
     }
     
-    func cameraViewDidDetectDocument(cameraView: ICPCameraView){
+    func cameraViewDidDetectDocument(_ cameraView: ICPCameraView){
         self.cameraView.takePhoto()
     }
     
     // MARK: Public methods
     
-    func imageCaptured(image: UIImage){
+    func imageCaptured(_ image: UIImage){
         self.page?.modifiedImage = image
-        self.performSegueWithIdentifier("next", sender: self)
+        self.performSegue(withIdentifier: "next", sender: self)
     }
 
 }

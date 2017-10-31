@@ -27,18 +27,19 @@ class MainViewController: BaseViewController {
     @IBOutlet weak var button2 : UIButton!
     @IBOutlet weak var button3 : UIButton!
     
-    let mainCapture = ICPCapture.instanceWithObjectFactoryType(ICPCaptureObjectFactoryType.NonPersistent)
-    let credential = NSURLCredential(user: SampleDatacapConfiguration.userName, password: SampleDatacapConfiguration.userPassword, persistence: NSURLCredentialPersistence.None)
+    let mainCapture = ICPCapture.instance(with: .nonPersistent)
+    let credential = URLCredential(user: SampleDatacapConfiguration.userName, password: SampleDatacapConfiguration.userPassword, persistence: .none)
     
     lazy var datacapService : ICPDatacapService =
     {
-        let service = self.mainCapture!.objectFactory!.datacapServiceWithBaseURL(NSURL(string: SampleDatacapConfiguration.url)!)
+        let service = self.mainCapture!.objectFactory!.datacapService(withBaseURL: URL(string: SampleDatacapConfiguration.url)!)
         service.allowInvalidCertificates = true
-        service.station = self.capture.objectFactory?.stationWithStationId(SampleDatacapConfiguration.stationId, andIndex: SampleDatacapConfiguration.stationIndex, andDescription: "")
-        service.application = self.capture.objectFactory?.applicationWithName(SampleDatacapConfiguration.applicationName)
-        service.workflow = self.capture.objectFactory?.workflowWithWorkflowId(SampleDatacapConfiguration.workflowId, andIndex: SampleDatacapConfiguration.workflowIndex)
-        service.job = self.capture.objectFactory?.jobWithJobId(SampleDatacapConfiguration.jobId, andIndex: SampleDatacapConfiguration.jobIndex)
-        service.setupDCO = self.capture.objectFactory?.setupDCOWithName(SampleDatacapConfiguration.setupDCOName)
+        service.station = self.capture.objectFactory?.station(withStationId: SampleDatacapConfiguration.stationId, andIndex: SampleDatacapConfiguration.stationIndex, andDescription: "")
+        service.application = self.capture.objectFactory?.application(withName: SampleDatacapConfiguration.applicationName)
+        service.workflow = self.capture.objectFactory?.workflow(withWorkflowId: SampleDatacapConfiguration.workflowId, andIndex: SampleDatacapConfiguration.workflowIndex)
+        service.job = self.capture.objectFactory?.job(withJobId: SampleDatacapConfiguration.jobId, andIndex: SampleDatacapConfiguration.jobIndex)
+        service.setupDCO = self.capture.objectFactory?.setupDCO(withName: SampleDatacapConfiguration.setupDCOName)
+        
         return service
         }()
     
@@ -48,11 +49,16 @@ class MainViewController: BaseViewController {
         }
     }
     
+    lazy var datacapHelper:ICPDatacapHelper = { [unowned self] in
+        let datacapHelper = ICPDatacapHelper(datacapService: self.datacapService, objectFactory: self.capture.objectFactory!, credential: self.credential)
+        return datacapHelper
+        }()
+    
     override var batchType : ICPBatchType? {
         
         didSet {
             if self.batchType != nil{
-                self.button2.enabled = true
+                self.button2.isEnabled = true
             }
         }
     }
@@ -63,7 +69,7 @@ class MainViewController: BaseViewController {
         super.viewDidLoad()
         
         self.capture = self.mainCapture
-        self.serviceClient = self.mainCapture!.datacapSessionManagerForService(self.datacapService, withCredential: self.credential)
+        self.serviceClient = self.mainCapture!.datacapSessionManager(for: self.datacapService, with: self.credential)
         
         self.fetchBatchType()
     }
@@ -73,18 +79,20 @@ class MainViewController: BaseViewController {
     
     @IBAction private func login(){
         
-        let hud = MBProgressHUD.showHUDAddedTo(self.view, animated: true)
-        hud.labelText = "Logging in"
+        let hud = MBProgressHUD.showAdded(to: self.view, animated: true)
+        hud?.labelText = "Logging in"
         
-        self.serviceClient.downloadBatchTypeWithSetup(self.datacapService.setupDCO!) { (success, result, error) -> Void in
+        self.serviceClient.downloadBatchType(withSetup: self.datacapService.setupDCO!) { (success, result, error) -> Void in
             if let batchTypeResponse = result {
                 self.batchType = batchTypeResponse
                 self.objectFactory?.save()
+                self.listConfigurations()
             }else{
                 self.showLoginError(error?.localizedDescription)
             }
             
-            MBProgressHUD.hideHUDForView(self.view, animated: true)
+            MBProgressHUD.hide(for: self.view, animated: true)
+            
             
         }
     }
@@ -102,15 +110,84 @@ class MainViewController: BaseViewController {
         
     }
     
-    private func showLoginError(errorMessage : String?)
+    private func showLoginError(_ errorMessage : String?)
     {
         if let message = errorMessage{
-            let alert = UIAlertController(title: "Error", message: message, preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
+            let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
         }
         
     }
     
+}
+
+extension MainViewController {
+    
+    fileprivate func listConfigurations() {
+        
+        self.datacapHelper.getApplicationList { (success, applications, error) in
+            guard success else {
+                return
+            }
+            
+            for application in applications {
+                print("application name: \(application.name)")
+            }
+        }
+        
+        guard let application = self.datacapService.application else {
+            return
+        }
+        
+        self.datacapHelper.getStationList(for: application) { (success, stations, error) in
+            guard success,
+                let stations = stations else {
+                    return
+            }
+            
+            for station in stations {
+                print("station id: \(station.stationId)")
+            }
+        }
+        
+        self.datacapHelper.getWorkflowList(for: application) { (success, workflows, error) in
+            guard success,
+                let workflows = workflows else {
+                    return
+            }
+            
+            for workflow in workflows {
+                print("workflow id: \(workflow.workflowId)")
+            }
+        }
+        
+        guard let workflow = self.datacapService.workflow else {
+            return
+        }
+        
+        self.datacapHelper.getJobList(for: application, workflow: workflow) { (success, jobs, error) in
+            guard success,
+                let jobs = jobs else {
+                    return
+            }
+            
+            for job in jobs {
+                print("job id: \(job.jobId)")
+            }
+        }
+        
+        self.datacapHelper.getSetupDCOs(for: application) { (success, setupDCOs, error) in
+            guard success,
+                let setupDCOs = setupDCOs else {
+                    return
+            }
+            
+            
+            for setupDCO in setupDCOs {
+                print("setup DCO name: \(setupDCO.name)")
+            }
+        }
+    }
 }
 

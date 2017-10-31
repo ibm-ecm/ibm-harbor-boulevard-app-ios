@@ -15,7 +15,7 @@ class CaptureFormViewController: CameraViewController {
         }
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         if TARGET_IPHONE_SIMULATOR == 1 && self.image == nil{

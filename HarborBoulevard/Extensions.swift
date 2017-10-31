@@ -7,7 +7,7 @@
 
 extension ICPPage{
 
-    func fieldWithType(typeId : String) -> ICPField?{
+    func fieldWithType(_ typeId : String) -> ICPField?{
         
         let filtered = self.fields.filter({ (field : ICPField) -> Bool in
             return field.type!.typeId == typeId
@@ -39,7 +39,7 @@ extension ICPPage{
             let field = self.fields[i]
             if let fieldType = field.type as? ICPFieldType{
                 let zone = fieldType.position()
-                let value = NSValue(CGRect: zone)
+                let value = NSValue(cgRect: zone)
                 zones.append(value)
             }
         }
@@ -52,21 +52,12 @@ extension ICPPage{
 
 extension ICPPageType {
     func referenceSize() -> CGSize{
-        
-        guard let pageWidth : CGFloat = CGFloat(self.referencePageWidth) else {
-            return CGSizeZero
-        }
-        
-        guard let pageHeight : CGFloat = CGFloat(self.referencePageHeight) else {
-            return CGSizeZero
-        }
-        
-        return CGSizeMake(pageWidth, pageHeight)
+        return CGSize(width: self.referencePageWidth, height: self.referencePageHeight)
     }
 }
 
 extension ICPBatchType{
-    func pageTypeWithType(typeId : String) -> ICPPageType? {
+    func pageTypeWithType(_ typeId : String) -> ICPPageType? {
         
         for documentType in self.documentTypes{
             for pageType in documentType.pageTypes{
@@ -81,7 +72,7 @@ extension ICPBatchType{
 }
 
 extension ICPBatch{
-    func pageWithType(typeId : String) -> ICPPage?{
+    func pageWithType(_ typeId : String) -> ICPPage?{
         if let document = self.documents.first{
             for page in document.pages{
                 if page.type?.typeId == typeId{
@@ -94,31 +85,31 @@ extension ICPBatch{
 }
 
 extension ICPFieldType {
-    func scaledZone(refSize : CGSize, actualSize : CGSize) -> CGRect {
+    func scaledZone(_ refSize : CGSize, actualSize : CGSize) -> CGRect {
         let position = self.position()
         return position.proportionalRect(fromImageSize: refSize, toImageSize: actualSize)
     }
     
     func position() -> CGRect {
-        var fieldDCODictionary: [NSObject : AnyObject] = self.dcoDictionary!
+        var fieldDCODictionary: [AnyHashable: Any] = self.dcoDictionary!
         
         if let positionString: String = fieldDCODictionary["Default_Position"] as? String{
-            var rectComponents: [String] = positionString.componentsSeparatedByString(",")
+            var rectComponents: [String] = positionString.components(separatedBy: ",")
             if rectComponents.count == 4 {
                 let float0: CGFloat = CGFloat((rectComponents[0] as NSString).floatValue)
                 let float1: CGFloat = CGFloat((rectComponents[1] as NSString).floatValue)
                 let float2: CGFloat = CGFloat((rectComponents[2] as NSString).floatValue)
                 let float3: CGFloat = CGFloat((rectComponents[3] as NSString).floatValue)
-                let relativeRect: CGRect = CGRectMake(float0, float1, float2 - float0, float3 - float1)
+                let relativeRect: CGRect = CGRect(x: float0, y: float1, width: float2 - float0, height: float3 - float1)
                 return relativeRect
             }
         }
-        return CGRectZero
+        return CGRect.zero
     }
 }
 
 extension UIImageView {
-    func addOcrZones(fields: [ICPField], refSize : CGSize) {
+    func addOcrZones(_ fields: [ICPField], refSize : CGSize) {
         
         let scaleFactor = self.image!.size.width / self.image!.size.height
         
@@ -139,10 +130,10 @@ extension UIImageView {
         
         for property in fields{
             let fieldType = property.type as! ICPFieldType
-            let rect: CGRect = fieldType.scaledZone(refSize, actualSize: CGSizeMake(width, height))
-            if !CGRectEqualToRect(rect, CGRectZero) {
-                let view: UIView = UIView(frame: CGRectMake(rect.origin.x + xOffset, rect.origin.y + yOffset, rect.size.width, rect.size.height))
-                view.layer.borderColor = self.tintColor.CGColor
+            let rect: CGRect = fieldType.scaledZone(refSize, actualSize: CGSize(width: width, height: height))
+            if !rect.equalTo(CGRect.zero) {
+                let view: UIView = UIView(frame: CGRect(x: rect.origin.x + xOffset, y: rect.origin.y + yOffset, width: rect.size.width, height: rect.size.height))
+                view.layer.borderColor = self.tintColor.cgColor
                 view.layer.borderWidth = 0.5
                 self.addSubview(view)
             }
@@ -152,14 +143,14 @@ extension UIImageView {
 
 extension CGRect {
     func proportionalRect(fromImageSize referenceImageSize: CGSize, toImageSize imageSize: CGSize) -> CGRect {
-        if CGSizeEqualToSize(referenceImageSize, imageSize) {
+        if referenceImageSize.equalTo(imageSize) {
             return self
         }
         let x: CGFloat = (self.origin.x / referenceImageSize.width) * imageSize.width
         let y: CGFloat = (self.origin.y / referenceImageSize.height) * imageSize.height
         let w: CGFloat = (self.size.width / referenceImageSize.width) * imageSize.width
         let h: CGFloat = (self.size.height / referenceImageSize.height) * imageSize.height
-        return CGRectMake(x, y, w, h)
+        return CGRect(x: x, y: y, width: w, height: h)
     }
 }
 

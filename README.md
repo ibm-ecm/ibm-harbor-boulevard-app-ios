@@ -21,14 +21,6 @@ The sample source code provided is intended to demonstrate the usage of the Data
 
 This document assumes the reader has a working knowledge of IBM Datacap, the Swift language and the iOS platform.
 
-#### SDK Prerequisites
-
-Here are the prerequisites for using the SDK:
-
-- An IBM Datacap server that runs IBM Datacap 9.0.1 or later
-- A mobile phone running iOS 8.1 or later
-- A computer running Xcode 7.3 or later
-- The IBM Datacap Mobile SDK 9.0.1 or later package
 
 # Installation
 

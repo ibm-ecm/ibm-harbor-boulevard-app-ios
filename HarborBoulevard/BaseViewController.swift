@@ -15,8 +15,8 @@ class BaseViewController: UIViewController {
     var service : ICPDatacapService!
     
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
-        if let baseViewController = segue.destinationViewController as? BaseViewController{
+    override func prepare(for segue: UIStoryboardSegue, sender: Any!) {
+        if let baseViewController = segue.destination as? BaseViewController{
             baseViewController.batchType = self.batchType
             baseViewController.capture = self.capture
             baseViewController.serviceClient = self.serviceClient

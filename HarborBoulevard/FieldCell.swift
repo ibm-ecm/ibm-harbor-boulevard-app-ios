@@ -16,7 +16,7 @@ class FieldCell: UITableViewCell, UITextFieldDelegate {
     
     // MARK: Public methods
     
-    func configureWithField(field : ICPField){
+    func configureWithField(_ field : ICPField){
         
         self.textField.delegate = self
         self.field = field
@@ -26,10 +26,10 @@ class FieldCell: UITableViewCell, UITextFieldDelegate {
     
     // MARK: UITextFieldDelegate
     
-    func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         
-        if let text = textField.text! as NSString?{
-            let newString = text.stringByReplacingCharactersInRange(range, withString: string)
+        if let text = textField.text as NSString? {
+            let newString = text.replacingCharacters(in: range, with: string)
             
             self.field!.value = newString;
         }

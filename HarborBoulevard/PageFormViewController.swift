@@ -21,7 +21,7 @@ class PageFormViewController: PageViewController {
             
             let zones = page.ocrZonesAsNSValues()
             
-            self.ocrEngine.recognizeTextsInImage(self.image!, withImageSize: self.refSize, withRects: zones, whitelist: nil, completionBlock: { (texts : [String], metadatas : [[String : [AnyObject]]]) -> Void in
+            self.ocrEngine.recognizeTexts(in: self.image!, withImageSize: self.refSize, withRects: zones, whitelist: nil, completionBlock: { (texts : [String], metadatas : [[String : [Any]]]) -> Void in
                 
                 for i in 0 ..< texts.count{
                     let field = page.fields[i]
